@@ -3,11 +3,11 @@ package commands
 import (
 	"fmt"
 
-	"github.com/avidal/boing/boinglib"
+	"github.com/avidal/boing/core"
 	"github.com/spf13/cobra"
 )
 
-var Config *boinglib.Config
+var Config *core.Config
 
 var BoingCmd = &cobra.Command{
 	Use:   "boing",
@@ -34,5 +34,5 @@ func init() {
 }
 
 func InitializeConfig() {
-	Config = boinglib.SetupConfig(&CfgFile)
+	Config = core.SetupConfig(&CfgFile)
 }

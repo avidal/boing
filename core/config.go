@@ -1,4 +1,4 @@
-package boinglib
+package core
 
 import (
 	"fmt"
