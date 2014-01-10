@@ -1,2 +1,28 @@
 bind = "localhost"
 port = 9999
+
+admins = ["alex"]
+
+[[users]]
+    username = "alex"
+    # <algo:plain>$<iterations:0>$<salt:>$<password>
+    # plain text password "tttt"
+    password = "$$$tttt"
+
+    real = "alex vidal"
+
+    nick = "avidal"
+    nick2 = "avidal`"
+    nick3 = "avidal``"
+
+    # connect to <bind>:<port> with server password
+    # <username>:<password>@<server name>
+    # eg; alex:tttt@synirc
+    [servers.synirc]
+        server = "irc.synirc.net:6667"
+
+        # override some user settings
+        real = "boing test"
+        nick = "_boing"
+        nick2 = "__boing"
+        nick3 = "___boing"
