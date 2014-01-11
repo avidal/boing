@@ -19,6 +19,8 @@ Complete documentation is available at https://github.com/avidal/boing`,
 	Run: func(cmd *cobra.Command, args []string) {
 		InitializeConfig()
 		fmt.Printf("Hello! Binding to %v:%v\n", Config.Bind, Config.Port)
+		fmt.Printf("Users: %#v\n", Config.Users)
+		fmt.Printf("Admins: %#v\n", Config.Admins)
 	},
 }
 

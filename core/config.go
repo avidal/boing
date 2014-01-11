@@ -1,10 +1,13 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
+	"strconv"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 )
@@ -14,6 +17,9 @@ type Config struct {
 
 	Bind string
 	Port int
+
+	Admins []string
+	Users  []User `toml:"user"`
 }
 
 var c Config
@@ -55,4 +61,33 @@ func (c *Config) findConfigFile(f string) string {
 	}
 
 	return path.Join(pwd, f)
+}
+
+// Unmarshaler for passwords in the config file
+func (p *UserPassword) UnmarshalText(text []byte) error {
+
+	// Split the text on the token
+	toks := strings.SplitN(string(text), "$", 4)
+
+	// If the length is not 4, bail
+	if len(toks) != 4 {
+		return errors.New("invalid password specification")
+	}
+
+	p.Algorithm = toks[0]
+	p.Salt = toks[2]
+	p.Hash = toks[3]
+
+	if toks[1] != "" {
+		iters, err := strconv.ParseInt(toks[1], 10, 8)
+		if err != nil {
+			return errors.New("invalid iteration count")
+		}
+		p.Iterations = int(iters)
+	} else {
+		p.Iterations = 0
+	}
+
+	return nil
+
 }

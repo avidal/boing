@@ -3,7 +3,13 @@ port = 9999
 
 admins = ["alex"]
 
-[[users]]
+[[user]]
+    username = "test"
+    password = "$$$tttt"
+
+    real = "boing test"
+
+[[user]]
     username = "alex"
     # <algo:plain>$<iterations:0>$<salt:>$<password>
     # plain text password "tttt"
@@ -18,7 +24,7 @@ admins = ["alex"]
     # connect to <bind>:<port> with server password
     # <username>:<password>@<server name>
     # eg; alex:tttt@synirc
-    [servers.synirc]
+    [user.servers.synirc]
         server = "irc.synirc.net:6667"
 
         # override some user settings
@@ -26,3 +32,4 @@ admins = ["alex"]
         nick = "_boing"
         nick2 = "__boing"
         nick3 = "___boing"
+
