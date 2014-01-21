@@ -87,6 +87,8 @@ func accept(c net.Conn) {
 
     // Loop until we read a PASS command, which will tell us what client and
     // server they are attempting to connect to
+    // TODO: We should handle CAP LS here, I think. Or buffer everything that
+    // comes before the PASS command and let the Proxy instance deal with it.
     for {
         l, err := c.Read(buf[0:])
         if err != nil {
@@ -115,6 +117,12 @@ func accept(c net.Conn) {
         u, err := Config.GetUser(username)
         log.Println("User:", u)
         log.Println("Error?", err)
+
+        if u == nil {
+            log.Println("No user found.")
+            c.Write([]byte(":localhost NOTICE AUTH :*** No such user.\r\n"))
+            c.Close()
+        }
 
         if u.CheckPassword(passwd) == false {
             log.Println("Password mismatch!")
