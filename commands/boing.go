@@ -3,6 +3,8 @@ package commands
 import (
     "fmt"
     "log"
+    "net"
+    "strings"
 
     "github.com/avidal/boing/core"
     "github.com/spf13/cobra"
@@ -55,7 +57,59 @@ func start() {
         log.Printf("Servers: %#v\n", user.Servers)
         go startUserProxy(&user)
     }
+
+    // Setup our listener for clients to connect to
+    bind := fmt.Sprintf("%s:%d", Config.Bind, Config.Port)
+    listener, err := net.Listen("tcp", bind)
+    if err != nil {
+        log.Fatalln(err)
+    }
+
+    log.Println("Listening on", bind)
+
+    for {
+        conn, err := listener.Accept()
+        if err != nil {
+            log.Fatalln("Error accepting connection:", err)
+        }
+
+        go accept(conn)
+    }
 }
 
-func startUserProxy(u *core.User) {
+func accept(c net.Conn) {
+    // Deals with the initial handshake with a newly connected client, then
+    // sets up a communication channel
+    log.Printf("Accepting connection from %s\n", c.RemoteAddr())
+
+    // Setup a buffer to read socket data into
+    var buf [512]byte
+
+    // Loop until we read a PASS command, which will tell us what client and
+    // server they are attempting to connect to
+    for {
+        l, err := c.Read(buf[0:])
+        if err != nil {
+            log.Println("Connection closed.")
+            return
+        }
+        msg := string(buf[0:l])
+        log.Println("RECV:", msg)
+        if strings.HasPrefix(msg, "PASS ") == false {
+            continue
+        }
+
+        // We read a PASS command, split on spaces, second part is the password
+        p := strings.Fields(msg)
+        p0 := strings.SplitN(p[1], ":", 2)
+        p1 := strings.SplitN(p0[1], "@", 2)
+
+        username := p0[0]
+        passwd := p1[0]
+        server := p1[1]
+
+        log.Printf("Username: %s, Password: %s, Server: %s", username, passwd, server)
+    }
 }
+
+func startUserProxy(u *core.User) {}
