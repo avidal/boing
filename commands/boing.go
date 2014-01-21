@@ -109,6 +109,20 @@ func accept(c net.Conn) {
         server := p1[1]
 
         log.Printf("Username: %s, Password: %s, Server: %s", username, passwd, server)
+
+        // Now, let's see if this user exists, and if so, does the password
+        // match and is the server configured
+        u, err := Config.GetUser(username)
+        log.Println("User:", u)
+        log.Println("Error?", err)
+
+        if u.CheckPassword(passwd) == false {
+            log.Println("Password mismatch!")
+            m := []byte(":localhost NOTICE AUTH :*** Invalid password!\r\n")
+            c.Write(m)
+            c.Close()
+        }
+
     }
 }
 
