@@ -1,4 +1,4 @@
-package core
+package server
 
 type Server struct {
     ServerName string `toml:"server"`

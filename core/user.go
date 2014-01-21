@@ -1,11 +1,13 @@
 package core
 
+import "github.com/avidal/boing/server"
+
 // Represents a user of the bouncer; pulled from the configuration
 type User struct {
     Username string
     Password UserPassword
 
-    Servers map[string]Server
+    Servers map[string]server.Server
 }
 
 type UserPassword struct {
