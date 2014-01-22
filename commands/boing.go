@@ -118,17 +118,20 @@ func accept(c net.Conn) {
         log.Println("User:", u)
         log.Println("Error?", err)
 
+        usage := []byte(":-boing NOTICE AUTH :*** Use <username>:<password>@<server> to connect to a server.\r\n")
+
         if u == nil {
             log.Println("No user found.")
             c.Write([]byte(":-boing NOTICE AUTH :*** No such user.\r\n"))
+            c.Write(usage)
             c.Close()
             return
         }
 
         if u.CheckPassword(passwd) == false {
             log.Println("Password mismatch!")
-            m := []byte(":-boing NOTICE AUTH :*** Invalid password!\r\n")
-            c.Write(m)
+            c.Write([]byte(":-boing NOTICE AUTH :*** Invalid password!\r\n"))
+            c.Write(usage)
             c.Close()
             return
         }
