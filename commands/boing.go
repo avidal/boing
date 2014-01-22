@@ -139,9 +139,7 @@ func accept(c net.Conn) {
 
         // Now, let's see if this user exists, and if so, does the password
         // match and is the server configured
-        u, err := Config.GetUser(username)
-        log.Println("User:", u)
-        log.Println("Error?", err)
+        u := Config.GetUser(username)
 
         if u == nil {
             log.Println("No user found.")
@@ -159,7 +157,16 @@ func accept(c net.Conn) {
             return
         }
 
-        // Now, let's see if this is a valid server
+        // Now, let's see if this is a valid server for this user
+        s := u.GetServer(server)
+
+        if s == nil {
+            log.Println("No server found.")
+            c.Write([]byte(":-boing NOTICE AUTH :*** No such server.\r\n"))
+            c.Write(usage)
+            c.Close()
+            return
+        }
 
     }
 }

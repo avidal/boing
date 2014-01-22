@@ -64,17 +64,17 @@ func (c *Config) findConfigFile(f string) string {
     return path.Join(pwd, f)
 }
 
-func (c *Config) GetUser(name string) (*User, error) {
+func (c *Config) GetUser(name string) *User {
     // Attempts to find a user by username, returns a pointer to the User if
     // found, otherwise returns nil with an error
     for _, u := range c.Users {
         log.Printf("%s == %s = %b", name, u.Username, name == u.Username)
 
         if name == u.Username {
-            return &u, nil
+            return &u
         }
     }
-    return nil, errors.New("No user found.")
+    return nil
 }
 
 // Unmarshaler for passwords in the config file
