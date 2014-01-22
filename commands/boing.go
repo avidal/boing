@@ -120,15 +120,17 @@ func accept(c net.Conn) {
 
         if u == nil {
             log.Println("No user found.")
-            c.Write([]byte(":localhost NOTICE AUTH :*** No such user.\r\n"))
+            c.Write([]byte(":-boing NOTICE AUTH :*** No such user.\r\n"))
             c.Close()
+            return
         }
 
         if u.CheckPassword(passwd) == false {
             log.Println("Password mismatch!")
-            m := []byte(":localhost NOTICE AUTH :*** Invalid password!\r\n")
+            m := []byte(":-boing NOTICE AUTH :*** Invalid password!\r\n")
             c.Write(m)
             c.Close()
+            return
         }
 
     }
