@@ -101,10 +101,35 @@ func accept(c net.Conn) {
             continue
         }
 
+        usage := []byte(":-boing NOTICE AUTH :*** Use <username>:<password>@<server> to connect to a server.\r\n")
+
         // We read a PASS command, split on spaces, second part is the password
         p := strings.Fields(msg)
+
+        if len(p) != 2 {
+            c.Write([]byte(":-boing NOTICE AUTH :*** Invalid PASS command!\r\n"))
+            c.Write(usage)
+            c.Close()
+            return
+        }
+
         p0 := strings.SplitN(p[1], ":", 2)
+
+        if len(p0) != 2 {
+            c.Write([]byte(":-boing NOTICE AUTH :*** Invalid PASS command!\r\n"))
+            c.Write(usage)
+            c.Close()
+            return
+        }
+
         p1 := strings.SplitN(p0[1], "@", 2)
+
+        if len(p1) != 2 {
+            c.Write([]byte(":-boing NOTICE AUTH :*** Invalid PASS command!\r\n"))
+            c.Write(usage)
+            c.Close()
+            return
+        }
 
         username := p0[0]
         passwd := p1[0]
@@ -117,8 +142,6 @@ func accept(c net.Conn) {
         u, err := Config.GetUser(username)
         log.Println("User:", u)
         log.Println("Error?", err)
-
-        usage := []byte(":-boing NOTICE AUTH :*** Use <username>:<password>@<server> to connect to a server.\r\n")
 
         if u == nil {
             log.Println("No user found.")
@@ -135,6 +158,8 @@ func accept(c net.Conn) {
             c.Close()
             return
         }
+
+        // Now, let's see if this is a valid server
 
     }
 }
