@@ -4,7 +4,6 @@ import (
     "errors"
     "fmt"
     "io/ioutil"
-    "log"
     "os"
     "path"
     "strconv"
@@ -68,8 +67,6 @@ func (c *Config) GetUser(name string) *User {
     // Attempts to find a user by username, returns a pointer to the User if
     // found, otherwise returns nil with an error
     for _, u := range c.Users {
-        log.Printf("%s == %s = %b", name, u.Username, name == u.Username)
-
         if name == u.Username {
             return &u
         }

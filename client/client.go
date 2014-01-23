@@ -1,3 +1,7 @@
 package client
 
-type Client struct{}
+import "net"
+
+type Client struct {
+    Conn *net.Conn
+}

@@ -7,6 +7,7 @@ import (
     "strings"
 
     "github.com/avidal/boing/core"
+    "github.com/avidal/boing/proxy"
     "github.com/spf13/cobra"
 )
 
@@ -48,14 +49,19 @@ func start() {
     // - Connect to all servers in the configuration
     // - Open a listening socket for client connections
 
-    // Each user in the configuration is handled by a single goroutine, each of
-    // those goroutines will then spawn additional ones to deal with
-    // communication
+    proxies := make([]proxy.ProxyServer, 16)
 
     for _, user := range Config.Users {
-        log.Println("Creating goroutine for user " + user.Username)
-        log.Printf("Servers: %#v\n", user.Servers)
-        go startUserProxy(&user)
+        log.Println("Creating proxies for user", user.Username)
+
+        // For each server, create a new ProxyServer and pass it &User and &Server
+        for _, server := range user.Servers {
+            proxy := proxy.NewProxy(&user, &server)
+            proxies = append(proxies, proxy)
+
+            proxy.Start()
+        }
+
     }
 
     // Setup our listener for clients to connect to
@@ -73,11 +79,12 @@ func start() {
             log.Fatalln("Error accepting connection:", err)
         }
 
-        go accept(conn)
+        go accept(conn, &proxies)
     }
+
 }
 
-func accept(c net.Conn) {
+func accept(c net.Conn, proxies *[]proxy.ProxyServer) {
     // Deals with the initial handshake with a newly connected client, then
     // sets up a communication channel
     log.Printf("Accepting connection from %s\n", c.RemoteAddr())
@@ -170,5 +177,3 @@ func accept(c net.Conn) {
 
     }
 }
-
-func startUserProxy(u *core.User) {}
